@@ -23,6 +23,12 @@ const ROOT = path.resolve(__dirname, '..');
 // >>> Change this to your real domain before going live <<<
 const SITE_URL = 'https://www.nabodiganta.org';
 
+// true  = public URLs without ".html" (/about instead of /about.html).
+//         Right for Cloudflare Pages, Vercel (cleanUrls) and Netlify. The deploy copy in dist/
+//         also gets its internal links rewritten to match (see tools/dist.js).
+// false = keep ".html" URLs (e.g. classic shared hosting / cPanel).
+const CLEAN_URLS = true;
+
 const ORG = {
   name: 'Nabodiganta',
   nameBn: 'নবদিগন্ত',
@@ -121,6 +127,12 @@ const PAGES = {
     description: "Photos and videos of Nabodiganta's work in classrooms, clinics, farms and relief points across Bangladesh.",
     crumbs: [['Media', 'notices.html'], ['Gallery', 'gallery.html']],
   },
+  '404.html': {
+    nav: '', priority: null, changefreq: null, noindex: true,
+    title: 'Page Not Found | Nabodiganta',
+    description: 'Sorry, we could not find that page. Explore our programmes, stories and ways to get involved.',
+    crumbs: [],
+  },
   'contact.html': {
     nav: 'contact', priority: '0.8', changefreq: 'monthly',
     title: 'Donate, Volunteer & Contact Us | Nabodiganta',
@@ -132,7 +144,11 @@ const PAGES = {
 const DEFAULT_IMAGE = 'assets/img/og-image.png';
 
 const e = (s = '') => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' })[c]);
-const url = (p = '') => `${SITE_URL.replace(/\/+$/, '')}/${p}`.replace('/index.html', '/');
+const url = (p = '') => {
+  let page = p.replace(/^index\.html/, '');
+  if (CLEAN_URLS) page = page.replace(/\.html(?=$|[?#])/, '');
+  return `${SITE_URL.replace(/\/+$/, '')}/${page}`;
+};
 const today = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -324,8 +340,8 @@ function headHtml(name, p) {
   const d = e(p.description);
   return `<title>${t}</title>
   <meta name="description" content="${d}">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="canonical" href="${canonical}">
+  <meta name="robots" content="${p.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'}">
+  ${p.noindex ? '' : `<link rel="canonical" href="${canonical}">`}
   <meta name="theme-color" content="#084a27">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
@@ -386,11 +402,15 @@ function buildSitemap() {
   fs.writeFileSync(path.join(ROOT, 'sitemap.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${rows}\n</urlset>\n`, 'utf8');
   fs.writeFileSync(path.join(ROOT, 'robots.txt'),
-    `User-agent: *\nAllow: /\nDisallow: /tools/\n\nSitemap: ${url('sitemap.xml')}\n`, 'utf8');
+    `User-agent: *\nAllow: /\n\nSitemap: ${url('sitemap.xml')}\n`, 'utf8');
   console.log('  wrote sitemap.xml, robots.txt');
 }
 
-console.log(`Building for ${SITE_URL}`);
-for (const [name, p] of Object.entries(PAGES)) buildPage(name, p);
-buildSitemap();
-console.log('Done.');
+module.exports = { CLEAN_URLS, PAGES };
+
+if (require.main === module) {
+  console.log(`Building for ${SITE_URL}`);
+  for (const [name, p] of Object.entries(PAGES)) buildPage(name, p);
+  buildSitemap();
+  console.log('Done.');
+}

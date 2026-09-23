@@ -1,0 +1,18 @@
+# Response headers for Cloudflare Pages and Netlify (same file format on both).
+# Vercel uses the "headers" section in vercel.json instead.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Images and icons rarely change: cache for 7 days
+/assets/img/*
+  Cache-Control: public, max-age=604800
+
+# CSS/JS keep their file names between releases, so browsers re-check them every hour
+/assets/css/*
+  Cache-Control: public, max-age=3600, must-revalidate
+/assets/js/*
+  Cache-Control: public, max-age=3600, must-revalidate

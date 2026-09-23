@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "description": "Nabodiganta NGO website — static HTML + Tailwind CSS",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "tailwindcss -i ./src/styles.css -o ./assets/css/site.css --watch",
     "build:css": "tailwindcss -i ./src/styles.css -o ./assets/css/site.css --minify",
     "build:pages": "node tools/build.js",
-    "build": "npm run build:pages && npm run build:css"
+    "build:dist": "node tools/dist.js",
+    "build": "npm run build:pages && npm run build:css && npm run build:dist"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.17"

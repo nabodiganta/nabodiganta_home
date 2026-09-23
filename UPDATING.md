@@ -26,14 +26,32 @@ When in doubt, run `npm run build` — it is always safe to run again.
 - Anything between `<!-- build:seo -->`, `<!-- build:header -->`, `<!-- build:footer -->` and their closing markers — it is overwritten by `npm run build`. Change it in `tools/build.js` instead.
 - `assets/css/site.css`, `sitemap.xml`, `robots.txt` — generated files.
 
-## Uploading to the server
+## Deploying
 
-Run `npm run build` first, then upload:
+`npm run build` creates a **`dist/`** folder — that folder *is* the website. It contains only public files, with clean links (`/about` instead of `about.html`). Every host uses the same two settings:
 
-- all `.html` files
-- `assets/`
-- `sitemap.xml`, `robots.txt`, `site.webmanifest`
+| Setting | Value |
+|---|---|
+| Build command | `npm run build` |
+| Output / publish directory | `dist` |
 
-Do **not** upload `node_modules/`, `src/`, `tools/`, `package.json`, `tailwind.config.js`.
+**With Git (recommended — every push redeploys automatically).** Push this project to GitHub, then:
 
-After the first upload, submit `https://your-domain/sitemap.xml` in Google Search Console.
+- **Cloudflare Pages:** dashboard → Workers & Pages → Create → Pages → Connect to Git → pick the repo → framework preset *None*, build command `npm run build`, output directory `dist` → Save and Deploy. (Node version comes from `.node-version`.)
+- **Netlify:** Add new site → Import an existing project → pick the repo. Settings are read from `netlify.toml` automatically → Deploy.
+- **Vercel:** Add New → Project → import the repo. Settings are read from `vercel.json` automatically → Deploy.
+
+**Without Git (manual).** Run `npm run build`, then:
+
+- **Cloudflare Pages:** Create → Pages → *Upload assets* → drag the `dist` folder.
+- **Netlify:** open app.netlify.com/drop → drag the `dist` folder.
+- **Vercel:** `npx vercel deploy dist --prod`
+
+Repeat for every update.
+
+**Classic hosting (cPanel / FTP):** set `CLEAN_URLS = false` in `tools/build.js`, run `npm run build`, upload the *contents* of `dist/` into `public_html`.
+
+**After the first deploy:**
+1. Add your custom domain in the host's dashboard (Custom domains).
+2. Put that domain in `SITE_URL` in `tools/build.js`, run `npm run build`, deploy again.
+3. Submit `https://your-domain/sitemap.xml` in Google Search Console.

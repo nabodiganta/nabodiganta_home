@@ -1,0 +1,7 @@
+# Netlify: settings are read from here automatically when you connect the Git repo.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

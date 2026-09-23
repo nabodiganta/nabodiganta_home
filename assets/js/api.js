@@ -132,7 +132,8 @@ async function loadSection(el) {
 
 // Keep <title>, description, canonical, Open Graph and Article schema in sync with the loaded post
 function updateSeo(p, slug) {
-  const url = new URL(`blog-post.html?slug=${encodeURIComponent(slug)}`, document.baseURI).href;
+  // Same path the visitor is on (/blog-post or blog-post.html), so it matches clean or .html URLs
+  const url = `${location.origin}${location.pathname}?slug=${encodeURIComponent(slug)}`;
   const image = p.image ? new URL(p.image, document.baseURI).href : null;
   const desc = p.excerpt || p.title;
   const set = (sel, val) => { const el = document.head.querySelector(sel); if (el && val) el.setAttribute(el.tagName === 'LINK' ? 'href' : 'content', val); };
