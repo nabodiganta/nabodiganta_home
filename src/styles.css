@@ -1,0 +1,71 @@
+/*
+  Source stylesheet. Tailwind compiles this into assets/css/site.css:
+    npm run dev        (rebuild automatically while you work)
+    npm run build:css  (minified, for production)
+  Do not edit assets/css/site.css directly — it is overwritten.
+*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 120px; }
+
+  /* Hide default <details> marker in mobile menu */
+  summary::-webkit-details-marker { display: none; }
+}
+
+/* Custom components sit before utilities, so Tailwind classes can still override them */
+@layer components {
+  /*
+    Photo slots. Real <img> tags (good for SEO + alt text) sitting on a brand gradient:
+      <div class="photo"><img src="assets/img/hero-1.jpg" alt="..." loading="lazy" onerror="this.remove()"></div>
+    If the file is missing, the image removes itself and the gradient shows instead.
+    (--img is still supported for purely decorative backgrounds, e.g. the lightbox.)
+  */
+  .photo {
+    overflow: hidden;
+    background-color: #084a27;
+    background-image: var(--img, none), linear-gradient(135deg, #084a27 0%, #16713f 55%, #84af39 100%);
+    background-size: cover;
+    background-position: center;
+  }
+  .photo:not(.absolute):not(.fixed) { position: relative; }
+  .photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .photo-sun {
+    background-image: var(--img, none), linear-gradient(135deg, #e38a0c 0%, #fcb72a 60%, #ffe39a 100%);
+  }
+  .photo-leaf {
+    background-image: var(--img, none), linear-gradient(135deg, #3f6f1c 0%, #558f27 50%, #84af39 100%);
+  }
+  .photo-dark {
+    background-image: var(--img, none), linear-gradient(135deg, #042915 0%, #084a27 60%, #558f27 100%);
+  }
+
+  /* Image tile zoom on hover */
+  .tile .photo { transition: transform .6s ease; }
+  .tile:hover .photo { transform: scale(1.06); }
+
+  /* Underline-on-hover links */
+  .link-line { background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat; transition: background-size .3s; }
+  .link-line:hover { background-size: 100% 2px; }
+
+  /* Hero slider */
+  .slide { opacity: 0; transition: opacity .9s ease; pointer-events: none; }
+  .slide.is-active { opacity: 1; pointer-events: auto; }
+
+  /* Notice ticker (content is duplicated in HTML, so -50% loops seamlessly) */
+  .marquee { width: max-content; animation: marquee 40s linear infinite; }
+  .marquee:hover { animation-play-state: paused; }
+
+  /* Horizontal scroll without a visible scrollbar (sub-menus on small screens) */
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Mega menu: open on hover / keyboard focus (desktop) */
+  .has-mega:hover > .mega,
+  .has-mega:focus-within > .mega { display: block; }
+}
+
+@keyframes marquee { to { transform: translateX(-50%); } }
