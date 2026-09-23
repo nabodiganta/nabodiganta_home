@@ -1,0 +1,14 @@
+// Cloudflare Workers (static assets) config — used by `npx wrangler deploy`.
+// "name" must match the Worker/project name you created in the Cloudflare dashboard.
+{
+  "name": "nabodiganta",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    // Upload only the built site, never node_modules or source files
+    "directory": "./dist",
+    // /about serves about.html
+    "html_handling": "auto-trailing-slash",
+    // Unknown URLs show 404.html with a real 404 status
+    "not_found_handling": "404-page"
+  }
+}
